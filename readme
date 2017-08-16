@@ -39,6 +39,9 @@ BUILDING
     packe into Debian package at dist/equeue_<version>_all.deb
     $ ./ctl dist
 
+    install to system by dpkg
+    $ dpkg -i dist/equeue_<version>_all.deb
+
     clear all of build files
     $ ./ctl clear
 
