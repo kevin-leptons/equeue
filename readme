@@ -1,0 +1,82 @@
+EQEUEU
+======
+
+    Error Handling for C language with multi-libraries.
+
+    Kevin Leptons <kevin.leptons@gmail.com>
+    LGPL License
+    Agust, 2017
+
+FEATURES
+========
+
+    - Error Items (EIs)
+    - Shared Error Queue (SEQ)
+    - Good work with multi-libraries
+
+USAGE
+=====
+    
+    #include <equeue/equeue.h>
+
+    EQUEUE_DEFINE(prefix, errstr_fn)
+    equeue_eitem * equeue_pop();
+    equeue_eitem * equeue_top();
+    size_t equeue_size();
+    void equeue_errstr(equeue_eitem "*item, char *str, size_t size);
+
+    See more with "man 3 equeue"
+    
+BUILDING
+========
+
+    dependency packages
+    $ apt-get install make cmake 
+
+    build from source code
+    $ ./ctl build
+
+    packe into Debian package at dist/equeue_<version>_all.deb
+    $ ./ctl dist
+
+    clear all of build files
+    $ ./ctl clear
+
+DESCRIPTON
+==========
+
+    C language doesn't provides built-in Error Handling mechanisms. Internal
+    library deal that prolems by solutions such as error code or longjmp() but
+    with multi-library using, problems becomes complicated. That is reason to
+    use equeue.
+
+    equeue use Shared Error Queue (SEQ) to stores Error Items (EIs). EIs
+    contains information about error such as file, line number, error code and
+    function which convert error to string. SEQ is shared in internal process,
+    that mean SEQ will be the same in process or between threads in process.
+
+    To use equeue, library MUST define Error Codes and Error String Function.
+    Error Codes is unsigned integer number, for clear, it is size_t type.
+    Error String Function convert Error Code to Error String with interface
+    const char * (*err_str)(size_t code).
+
+    Detect information about error at runtime is hard, not performance or
+    imposible in some case, so it is detect in complie time. For that, equeue
+    can't provides same APIs for all other libraries and EQUEUE_DEFINE() macro
+    is use to create new function to push EIs into SEQ. For example, if use
+    EQUEUE_DEFINE(abcerr, abcerr_errstr), new function will be define:
+    abcerr_push(size_t code).  errstr_fn Error String Function.
+
+    equeue_pop() removes front EIs of SEQ then return pointer to it.
+    equeue_top() return pointer to front EIs of SEQ. equeue_size() return
+    number of EIs in SEQ.  equeue_clear() empty SEQ. equeue_errstr() create
+    string with error information of item.
+
+    Whenever error occurs, if it can be solve then MUST NOT push it into SEQ
+    and MUST call equeue_clear() to clear SEQ to ensure that prev errors isn't
+    mistake with next calls.
+
+REFERENCES
+==========
+
+    None
