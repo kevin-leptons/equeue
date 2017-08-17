@@ -22,7 +22,8 @@ const char * abc_errstr(size_t code)
         return ABC_ERR_STRS[code];
 }
 
-EQUEUE_DEFINE(abcerr, abc_errstr)  // define abcerr_push(size_t code)
+EQUEUE_DECLARE(abcerr, abc_errstr)  // declare abcerr_push(size_t code)
+EQUEUE_DEFINE(abcerr, abc_errstr)   // define abcerr_push(size_t code)
 
 #define ERR_STR_SIZE 1024
 

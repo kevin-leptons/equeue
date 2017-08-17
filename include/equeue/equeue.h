@@ -35,13 +35,11 @@ AUTHORS
 
 #define EQUEUE_RQUEUE_MAX_SIZE 1024
 
-struct rqueue_item shared_rqueue_items[EQUEUE_RQUEUE_MAX_SIZE] ;
-struct rqueue shared_rqueue = {
-    shared_rqueue_items,                                    // top_border
-    shared_rqueue_items + EQUEUE_RQUEUE_MAX_SIZE - 1,       // bot_border
-    NULL, NULL,                                             // top, bot
-    0, EQUEUE_RQUEUE_MAX_SIZE                               // size, max_size
-};
+extern struct rqueue_item shared_rqueue_items[EQUEUE_RQUEUE_MAX_SIZE] ;
+extern struct rqueue shared_rqueue;
+
+#define EQUEUE_DECLARE(prefix, errstr_fn) \
+    void prefix##_push(size_t code);
 
 #define EQUEUE_DEFINE(prefix, errstr_fn) \
     void prefix##_push(size_t code) { \
