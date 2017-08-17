@@ -43,8 +43,8 @@ struct rqueue shared_rqueue = {
     0, EQUEUE_RQUEUE_MAX_SIZE                               // size, max_size
 };
 
-#define EQUEUE_DEFINE(equeue_name, errstr_fn) \
-    void equeue_name##_push(size_t code) { \
+#define EQUEUE_DEFINE(prefix, errstr_fn) \
+    void prefix##_push(size_t code) { \
         rqueue_push(&shared_rqueue, __FILE__, __LINE__, __FUNCTION__, \
                     errstr_fn, code); \
     }
