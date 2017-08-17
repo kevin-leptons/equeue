@@ -28,7 +28,7 @@ HELP="USAGE\n
     $(basename $0) build        build repo
     $(basename $0) clear        clear build files
     $(basename $0) dist         pack repo into .deb file
-    $(basename $0) -h           show help menu"
+    $(basename $0) -h           show help menu\n"
 
 ctl_build()
 {
