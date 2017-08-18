@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     abcerr_push(ABC_EXX);
     abcerr_push(ABC_EYY);
     abcerr_push(1024);              // invalid error code
+    abcerr_push_here();
 
     printf("size of SEQ: %zu\n", equeue_size());
     for (; equeue_size() > 0;) {

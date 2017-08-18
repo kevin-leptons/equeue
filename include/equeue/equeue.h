@@ -39,12 +39,17 @@ extern struct rqueue_item shared_rqueue_items[EQUEUE_RQUEUE_MAX_SIZE] ;
 extern struct rqueue shared_rqueue;
 
 #define EQUEUE_DECLARE(prefix, errstr_fn) \
-    void prefix##_push(size_t code);
+    void prefix##_push(size_t code); \
+    void prefix##_push_here(void);
 
 #define EQUEUE_DEFINE(prefix, errstr_fn) \
     void prefix##_push(size_t code) { \
         rqueue_push(&shared_rqueue, __FILE__, __LINE__, __FUNCTION__, \
                     errstr_fn, code); \
+    } \
+    void prefix##_push_here(void) { \
+        rqueue_push(&shared_rqueue, __FILE__, __LINE__, __FUNCTION__, \
+                    errstr_fn, 0); \
     }
 
 #define equeue_pop() rqueue_pop(&shared_rqueue)
