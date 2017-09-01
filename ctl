@@ -22,7 +22,7 @@ DEST="$ROOT/dest"
 DEST_MAN="$DEST/man/equeue.3.gz"
 DIST="$ROOT/dist"
 DIST_PKG="$DIST/equeue"
-VERSION="0.2.0"
+VERSION="0.3.0"
 
 # help menu
 HELP="USAGE\n

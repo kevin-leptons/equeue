@@ -1,3 +1,6 @@
+v0.3.0
+	Add equeue_spush_now().
+
 v0.2.0
 	Require end-user define Error Pushhing Function.
 
