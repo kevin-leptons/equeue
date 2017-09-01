@@ -53,11 +53,13 @@ struct rqueue
 };
 
 void rqueue_init(struct rqueue *q, struct rqueue_item *mem, size_t max_size);
-void rqueue_push(struct rqueue *q, const char *file, size_t line,
-                 const char *fname, const char * (*errstr)(size_t code),
-                 size_t code);
+void rqueue_push(struct rqueue *q, const char *err_space, 
+                 const char *fn_name, size_t code,
+                 const char * (*errstr)(size_t code));
 struct equeue_eitem * rqueue_pop(struct rqueue *q);
 struct equeue_eitem * rqueue_top(struct rqueue *q);
+void rqueue_dump(struct rqueue *q);
+void rqueue_dumpto(int fd, struct rqueue *q);
 size_t rqueue_size(struct rqueue *q);
 void rqueue_clear(struct rqueue *q);
 void rqueue_free(struct rqueue *q);

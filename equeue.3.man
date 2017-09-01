@@ -7,51 +7,68 @@ equeue \- Error Queue
 .nf
 #include <equeue/equeue.h>
 .sp
-EQUEUE_DEFINE(prefix, errstr_fn)
+// MACROS as functions
+void equeue_push(const char *err_space, code,
+                 const char (*errstr)(size_t code));
+void equeue_emit();
+void equeue_spush(code);
 equeue_eitem * equeue_pop();
 equeue_eitem * equeue_top();
 size_t equeue_size();
-void equeue_errstr(equeue_eitem "*item, char *str, size_t size);
+void equeue_clear();
+void equeue_dump();
+void equeue_dumpto(int fd);
+
+// FUNCTIONS
+void equeue_eitem_errstr(struct equeue_eitem *eitem, char *str,
+                         size_t size);
 
 .SH COMPLEXITY
 .nf
-fn                          Big-O
-------------------------------------
-<prefix>_push()             O(1)
-equeue_pop()                O(1)
-equeue_top()                O(1)
-equeue_clear()              O(1)
-equeue_size()               O(1)
-equeue_errstr()             O(n)
+fn                              Big-O
+--------------------------------------
+equeue_push()                   O(1)
+equeue_epush()                  O(1)
+equeue_emit()                   O(1)
+equeue_pop()                    O(1)
+equeue_top()                    O(1)
+equeue_dump()                   O(n)
+equeue_dumpto()                 O(n)
+equeue_clear()                  O(1)
+equeue_size()                   O(1)
+equeue_eitem_errstr()           O(1) 
 
 .SH DESCRIPTION
 
 C language doesn't provides built-in Error Handling mechanisms. Internal
-library deal that prolems by solutions such as error code or longjmp()
-but with multi-library using, problems becomes complicated. That is reason
-to use equeue.
+library deal that prolems by solutions such as error code or longjmp() but
+with multi-library using, problems becomes complicated. That is reason to
+use equeue.
 
-equeue use Shared Error Queue (SEQ) to stores Error Items (EIs). EIs contains
-information about error such as file, line number, error code and  function
-which convert error to string. SEQ is shared in internal process, that mean
-SEQ will be the same in process or between threads in process.
+equeue use Shared Error Queue (SEQ) to stores Error Items (EIs). EIs
+contains information about error such as file, line number, error code and
+function which convert error to string. SEQ is shared in internal process,
+that mean SEQ will be the same in process or between threads in process.
 
-To use equeue, library MUST define Error Codes and Error String Function.
-Error Codes is unsigned integer number, for clear, it is size_t type.
-Error String Function convert Error Code to Error String with interface
-const char * (*err_str)(size_t code).
+To use equeue, library MUST define your Error Space, inludes: Error Codes,
+Error Strings, Error String Function, Error Pushing Function. Error Codes
+is unique unsigned integer number represent for unique Error. Error
+Strings is strings correspond with Error Codes. Error String Function
+convert Error Code to Error String with interface const char *
+(*err_str)(size_t code). Error Pushing Function push Error Code into SEQ.
 
 Detect information about error at runtime is hard, not performance or
 imposible in some case, so it is detect in complie time. For that, equeue
-can't provides same APIs for all other libraries and EQUEUE_DEFINE() macro is
-use to create new function to push EIs into SEQ. For example, if use
-EQUEUE_DEFINE(abcerr, abcerr_errstr), new function will be define:
-abcerr_push(size_t code).  errstr_fn Error String Function.
+can't provides same APIs for all other libraries and you MUST self-define
+Error Pushing Function.
 
-equeue_pop() removes front EIs of SEQ then return pointer to it.  equeue_top()
-return pointer to front EIs of SEQ. equeue_size() return number of EIs in SEQ.
-equeue_clear() empty SEQ. equeue_errstr() create string with error information
-of item.
+equeue_push() push EI into SEQ.  equeue_spush() push System Error Code
+into SEQ. equeue_emit() push EQUEUE_EEMIT into SEQ. equeue_pop() removes
+front EIs of SEQ then return pointer to it.  equeue_top() return pointer
+to front EIs of SEQ.  equeue_size() return number of EIs in SEQ.
+equeue_dump() and equeue_dumpto() print SEQ to ouput file descriptor and
+empty SEQ.  equeue_clear() empty SEQ.  equeue_errstr() create string with
+error information of item.
 
 Whenever error occurs, if it can be solve then MUST NOT push it into SEQ
 and MUST call equeue_clear() to clear SEQ to ensure that prev errors isn't
@@ -63,55 +80,7 @@ SIGABRT
 on SEQ is full, size of SEQ is 1024
 
 .SH EXAMPLES
-.nf
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <equeue/equeue.h>
-
-#define ABC_ERR_SIZE 3
-#define ABC_ENO 0
-#define ABC_EXX 1
-#define ABC_EYY 2 // and more error codes...
-
-const char *ABC_ERR_STRS[ABC_ERR_SIZE] = {
-    "No Error",
-    "First Error Code",
-    "Second Error Code"
-};
-
-const char * abc_errstr(size_t code)
-{
-    if (code >= ABC_ERR_SIZE)
-        return "Unknow Error";
-    else
-        return ABC_ERR_STRS[code];
-}
-
-EQUEUE_DEFINE(abcerr, abc_errstr)  // define abcerr_push(size_t code)
-
-#define ERR_STR_SIZE 1024
-
-int main(int argc, char *argv[])
-{
-    struct equeue_eitem *eitem;
-    char errstr[ERR_STR_SIZE];
-
-    abcerr_push(ABC_ENO);
-    abcerr_push(ABC_EXX);
-    abcerr_push(ABC_EYY);
-    abcerr_push(1024);              // invalid error code
-
-    printf("size of SEQ: %zu\n", equeue_size());
-    for (; equeue_size() > 0;) {
-        eitem = equeue_pop();
-        equeue_errstr(eitem, errstr, ERR_STR_SIZE);
-        printf("Error: %s\n", errstr);
-    }
-    printf("size of SEQ: %zu\n", equeue_size());
-
-    return EXIT_SUCCESS;
-}
+See /usr/share/doc/equeue/example/*.c
 
 .SH FILES
 .TP 4
@@ -127,7 +96,7 @@ Header files.
 Manunal file.
 
 .SH REFERENCES 
-equeue repository at https://github.com/kevin-leptons/equeue
+Development repository at https://github.com/kevin-leptons/equeue
 
 .SH AUTHORS
 Kevin Leptons <kevin.leptons@gmail.com>

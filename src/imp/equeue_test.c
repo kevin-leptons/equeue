@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include <equeue/equeue.h>
 
 #define ABC_ERR_SIZE 3
-#define ABC_ENO 0
-#define ABC_EXX 1
-#define ABC_EYY 2 // and more error codes...
+#define ABC_ENONE 0
+#define ABC_E001 1
+#define ABC_E002 2 // and more error codes...
 
 const char *ABC_ERR_STRS[ABC_ERR_SIZE] = {
     "No Error",
@@ -22,29 +23,59 @@ const char * abc_errstr(size_t code)
         return ABC_ERR_STRS[code];
 }
 
-EQUEUE_DECLARE(abcerr, abc_errstr)  // declare abcerr_push(size_t code)
-EQUEUE_DEFINE(abcerr, abc_errstr)   // define abcerr_push(size_t code)
+#define abcerr_push(code) equeue_push(EQUEUE_ERR_SPACE, code, abc_errstr)
 
 #define ERR_STR_SIZE 1024
 
+int do_sys_wrong(void)
+{
+    equeue_spush(ENOMEM);
+    return -1;
+}
+
+int do_wrong(void)
+{
+    if (do_sys_wrong()) {
+        abcerr_push(ABC_E001);
+        return -1;
+    }
+    return 0;
+}
+
+int do_other_wrong(void)
+{
+    if (do_wrong()) {
+        abcerr_push(ABC_E002);
+        return -1;
+    }
+
+    return 0;
+}
+
+int do_unknow(void)
+{
+    if (do_other_wrong()) {
+        abcerr_push(ABC_ENONE);
+        return -1;
+    }
+
+    return 0;
+}
+
+int do_smt(void)
+{
+    if (do_unknow()) {
+        equeue_emit();
+        return -1;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
-    struct equeue_eitem *eitem;
-    char errstr[ERR_STR_SIZE];
-
-    abcerr_push(ABC_ENO);
-    abcerr_push(ABC_EXX);
-    abcerr_push(ABC_EYY);
-    abcerr_push(1024);              // invalid error code
-    abcerr_push_here();
-
-    printf("size of SEQ: %zu\n", equeue_size());
-    for (; equeue_size() > 0;) {
-        eitem = equeue_pop();
-        equeue_errstr(eitem, errstr, ERR_STR_SIZE);
-        printf("Error: %s\n", errstr);
-    }
-    printf("size of SEQ: %zu\n", equeue_size());
+    if (do_smt())
+        equeue_dump();
 
     return EXIT_SUCCESS;
 }

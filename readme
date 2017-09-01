@@ -5,7 +5,7 @@ EQUEUE
 
     Kevin Leptons <kevin.leptons@gmail.com>
     LGPL License
-    Agust, 2017
+    Sept, 2017
 
 FEATURES
 ========
@@ -17,16 +17,28 @@ FEATURES
 USAGE
 =====
     
+    /*
+    This is interfaces of equeue. For more explain and user manual, see
+    "man 3 equeue".
+    */
+
     #include <equeue/equeue.h>
 
-    EQUEUE_DEFINE(prefix, errstr_fn)
+    // MACROS as functions
+    void equeue_push(const char *err_space, code,
+                     const char (*errstr)(size_t code));
+    void equeue_emit();
+    void equeue_spush(code);
     equeue_eitem * equeue_pop();
     equeue_eitem * equeue_top();
     size_t equeue_size();
-    void equeue_errstr(equeue_eitem "*item, char *str, size_t size);
+    void equeue_clear();
+    void equeue_dump();
+    void equeue_dumpto(int fd);
 
-    See more with "man 3 equeue"
-    
+    // FUNCTIONS
+    void equeue_eitem_errstr(struct equeue_eitem *eitem, char *str,
+                             size_t size);
 BUILDING
 ========
 
@@ -36,7 +48,7 @@ BUILDING
     build from source code
     $ ./ctl build
 
-    packe into Debian package at dist/equeue_<version>_all.deb
+    pack into Debian package at dist/equeue_<version>_all.deb
     $ ./ctl dist
 
     install to system by dpkg
@@ -58,26 +70,30 @@ DESCRIPTON
     function which convert error to string. SEQ is shared in internal process,
     that mean SEQ will be the same in process or between threads in process.
 
-    To use equeue, library MUST define Error Codes and Error String Function.
-    Error Codes is unsigned integer number, for clear, it is size_t type.
-    Error String Function convert Error Code to Error String with interface
-    const char * (*err_str)(size_t code).
+    To use equeue, library MUST define your Error Space, inludes: Error Codes,
+    Error Strings, Error String Function, Error Pushing Function. Error Codes
+    is unique unsigned integer number represent for unique Error. Error
+    Strings is strings correspond with Error Codes. Error String Function
+    convert Error Code to Error String with interface const char *
+    (*err_str)(size_t code). Error Pushing Function push Error Code into SEQ.
 
     Detect information about error at runtime is hard, not performance or
     imposible in some case, so it is detect in complie time. For that, equeue
-    can't provides same APIs for all other libraries and EQUEUE_DEFINE() macro
-    is use to create new function to push EIs into SEQ. For example, if use
-    EQUEUE_DEFINE(abcerr, abcerr_errstr), new function will be define:
-    abcerr_push(size_t code).  errstr_fn Error String Function.
+    can't provides same APIs for all other libraries and you MUST self-define
+    Error Pushing Function.
 
-    equeue_pop() removes front EIs of SEQ then return pointer to it.
-    equeue_top() return pointer to front EIs of SEQ. equeue_size() return
-    number of EIs in SEQ.  equeue_clear() empty SEQ. equeue_errstr() create
-    string with error information of item.
+    equeue_push() push EI into SEQ.  equeue_spush() push System Error Code
+    into SEQ. equeue_emit() push EQUEUE_EEMIT into SEQ. equeue_pop() removes
+    front EIs of SEQ then return pointer to it.  equeue_top() return pointer
+    to front EIs of SEQ.  equeue_size() return number of EIs in SEQ.
+    equeue_dump() and equeue_dumpto() print SEQ to ouput file descriptor and
+    empty SEQ.  equeue_clear() empty SEQ.  equeue_errstr() create string with
+    error information of item.
 
     Whenever error occurs, if it can be solve then MUST NOT push it into SEQ
     and MUST call equeue_clear() to clear SEQ to ensure that prev errors isn't
     mistake with next calls.
+
 
 REFERENCES
 ==========

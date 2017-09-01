@@ -17,6 +17,7 @@
 set -e
 
 ROOT=$(realpath .)
+SRC="$ROOT/src"
 DEST="$ROOT/dest"
 DEST_MAN="$DEST/man/equeue.3.gz"
 DIST="$ROOT/dist"
@@ -63,6 +64,10 @@ ctl_dist()
 
     mkdir -vp $DIST_PKG/usr/share/man/man3
     cp $DEST_MAN $DIST_PKG/usr/share/man/man3
+
+    local DIST_DOC_EX="$DIST_PKG/usr/share/doc/equeue/example"
+    mkdir -vp $DIST_DOC_EX
+    cp $SRC/imp/endpoint-test.c $DIST_DOC_EX/simple.c
 
     cd $DIST
     dpkg-deb --build -D $DIST_PKG $DIST

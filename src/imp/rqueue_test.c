@@ -7,6 +7,7 @@
 #define ERRSTR_SIZE 1024
 
 const char *sample_errstr(size_t code);
+const char RQUEUE_ERR_SPACE[] = "request_test";
 
 int main(int argc, char *argv[])
 {
@@ -23,27 +24,27 @@ int main(int argc, char *argv[])
     // push 1/2 of max size items
     rqueue_init(&q, mem, RQUEUE_MAX_SIZE);
     for (i = 0; i < RQUEUE_MAX_SIZE / 2; i++) {
-        rqueue_push(&q, __FILE__, __LINE__, __FUNCTION__,
-                    sample_errstr, values[i]);
+        rqueue_push(&q, RQUEUE_ERR_SPACE, __FUNCTION__, values[i],
+                    sample_errstr);
     }
 
     // pop all
     for (; q.size > 0;) {
         item = rqueue_pop(&q);
-        equeue_errstr(item, errstr, ERRSTR_SIZE);
+        equeue_eitem_errstr(item, errstr, ERRSTR_SIZE);
         printf("%s\n", errstr);
     }
 
     // push of max size items
     for (i = 0; i < RQUEUE_MAX_SIZE; i++) {
-        rqueue_push(&q, __FILE__, __LINE__, __FUNCTION__,
-                    sample_errstr, values[i]);
+        rqueue_push(&q, RQUEUE_ERR_SPACE, __FUNCTION__, values[i],
+                    sample_errstr);
     }
 
     // pop all
     for (; q.size > 0;) {
         item = rqueue_pop(&q);
-        equeue_errstr(item, errstr, ERRSTR_SIZE);
+        equeue_eitem_errstr(item, errstr, ERRSTR_SIZE);
         printf("%s\n", errstr);
     }
 

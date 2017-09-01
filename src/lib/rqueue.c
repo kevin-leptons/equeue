@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdio.h>
 
 void rqueue_init(struct rqueue *q, struct rqueue_item *mem, size_t max_size)
 {
@@ -14,9 +15,9 @@ void rqueue_init(struct rqueue *q, struct rqueue_item *mem, size_t max_size)
     q->max_size = max_size;
 }
 
-void rqueue_push(struct rqueue *q, const char *file, size_t line,
-                const char *fname, const char * (*errstr)(size_t code),
-                size_t code)
+void rqueue_push(struct rqueue *q, const char *err_space, 
+                 const char *fn_name, size_t code,
+                 const char * (*errstr)(size_t code))
 {
     if (q->size == q->max_size)
         kill(getpid(), SIGABRT);
@@ -30,9 +31,8 @@ void rqueue_push(struct rqueue *q, const char *file, size_t line,
             q->bot = q->top_border;
     }
 
-    q->bot->value.file = file;
-    q->bot->value.line = line;
-    q->bot->value.fname = fname;
+    q->bot->value.err_space = err_space;
+    q->bot->value.fn_name = fn_name;
     q->bot->value.errstr = errstr;
     q->bot->value.code = code;
 
@@ -66,6 +66,23 @@ struct equeue_eitem * rqueue_top(struct rqueue *q)
     if (q->size == 0)
         return NULL;
     return &q->top->value;
+}
+
+void rqueue_dump(struct rqueue *q)
+{
+    rqueue_dumpto(STDERR_FILENO, q);
+}
+
+void rqueue_dumpto(int fd, struct rqueue *q)
+{
+    struct equeue_eitem *item;
+
+    for (; q->size > 0;) {
+        item = rqueue_pop(q);
+        dprintf(fd, "#%zu, %s:%s():%zu\n", q->size, item->err_space, 
+                item->fn_name, item->code);
+        dprintf(fd, "%s\n\n", item->errstr(item->code));
+    }
 }
 
 size_t rqueue_size(struct rqueue *q)

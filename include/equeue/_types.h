@@ -23,13 +23,12 @@ AUTHORS
 
 struct equeue_eitem
 {
-    const char *file;
-    const char *fname;
+    const char *err_space;
+    const char *fn_name;
     const char *(*errstr)(size_t code);
-    size_t line;
     size_t code;
 };
 
-void equeue_errstr(struct equeue_eitem *eitem, char *str, size_t size);
+void equeue_eitem_errstr(struct equeue_eitem *eitem, char *str, size_t size);
 
 #endif
