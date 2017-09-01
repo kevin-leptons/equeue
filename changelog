@@ -1,5 +1,5 @@
 v0.3.0
-	Add equeue_spush_now().
+	Add equeue_cspush().
 
 v0.2.0
 	Require end-user define Error Pushhing Function.

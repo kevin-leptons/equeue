@@ -29,6 +29,7 @@ USAGE
                      const char (*errstr)(size_t code));
     void equeue_emit();
     void equeue_spush(code);
+    void equeue_cspush();
     equeue_eitem * equeue_pop();
     equeue_eitem * equeue_top();
     size_t equeue_size();
@@ -82,18 +83,18 @@ DESCRIPTON
     can't provides same APIs for all other libraries and you MUST self-define
     Error Pushing Function.
 
-    equeue_push() push EI into SEQ.  equeue_spush() push System Error Code
-    into SEQ. equeue_emit() push EQUEUE_EEMIT into SEQ. equeue_pop() removes
-    front EIs of SEQ then return pointer to it.  equeue_top() return pointer
-    to front EIs of SEQ.  equeue_size() return number of EIs in SEQ.
-    equeue_dump() and equeue_dumpto() print SEQ to ouput file descriptor and
-    empty SEQ.  equeue_clear() empty SEQ.  equeue_errstr() create string with
-    error information of item.
+    equeue_push() push EI into SEQ. equeue_spush() push System Error Code into
+    SEQ. equeue_cspush() push current system error "errno" into SEQ.
+    equeue_emit() push EQUEUE_EEMIT into SEQ. equeue_pop() removes front EIs
+    of SEQ then return pointer to it.  equeue_top() return pointer to front
+    EIs of SEQ.  equeue_size() return number of EIs in SEQ.  equeue_dump() and
+    equeue_dumpto() print SEQ to ouput file descriptor and empty SEQ.
+    equeue_clear() empty SEQ.  equeue_errstr() create string with error
+    information of item.
 
     Whenever error occurs, if it can be solve then MUST NOT push it into SEQ
     and MUST call equeue_clear() to clear SEQ to ensure that prev errors isn't
     mistake with next calls.
-
 
 REFERENCES
 ==========

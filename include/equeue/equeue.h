@@ -10,7 +10,8 @@ COMPLEXITY
     fn                              best
     ==========================================
     equeue_push()                   O(1)
-    equeue_epush()                  O(1)
+    equeue_spush()                  O(1)
+    equeue_cspush()                 O(1)
     equeue_emit()                   O(1)
     equeue_pop()                    O(1)
     equeue_top()                    O(1)
@@ -33,6 +34,8 @@ AUTHORS
 
 #ifndef __EQUEUE_EQUEUE_H__
 #define __EQUEUE_EQUEUE_H__
+
+#include <errno.h>
 
 #include <equeue/_types.h>
 #include <equeue/_rqueue.h>
@@ -58,6 +61,7 @@ const char *equeue_sys_errstr(size_t code);
 #define equeue_spush(code) \
     rqueue_push(&shared_rqueue, EQUEUE_SERR_SPACE, __FUNCTION__, code, \
                 equeue_sys_errstr)
+#define equeue_cspush() equeue_spush(errno)
 #define equeue_pop() rqueue_pop(&shared_rqueue)
 #define equeue_top() rqueue_top(&shared_rqueue)
 #define equeue_size() rqueue_size(&shared_rqueue)
