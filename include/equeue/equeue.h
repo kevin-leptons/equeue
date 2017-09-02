@@ -7,8 +7,8 @@ NAME
 COMPLEXITY
 ==========
 
-    fn                              best
-    ==========================================
+    fn                              best    notes
+    --------------------------------------------------------------------------
     equeue_push()                   O(1)
     equeue_spush()                  O(1)
     equeue_cspush()                 O(1)
@@ -19,7 +19,7 @@ COMPLEXITY
     equeue_dumpto()                 O(n)
     equeue_clear()                  O(1)
     equeue_size()                   O(1)
-    equeue_eitem_errstr()           O(1) // from <equeue/_type.h>
+    equeue_eitem_errstr()           O(1)    from <equeue/_type.h>
 
 DESCRIPTION
 ===========
@@ -45,8 +45,8 @@ AUTHORS
 #define EQUEUE_ENONE 0
 #define EQUEUE_EEMIT 1
 
-const char EQUEUE_ERR_SPACE[] = "equeue";
-const char EQUEUE_SERR_SPACE[] = "system";
+extern const char EQUEUE_ERR_SPACE[];
+extern const char EQUEUE_SERR_SPACE[];
 extern struct rqueue_item shared_rqueue_items[EQUEUE_RQUEUE_MAX_SIZE] ;
 extern struct rqueue shared_rqueue;
 

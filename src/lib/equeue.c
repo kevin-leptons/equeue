@@ -3,10 +3,11 @@
 #include <errno.h>
 #include <string.h>
 
+const char EQUEUE_ERR_SPACE[] = "equeue";
+const char EQUEUE_SERR_SPACE[] = "system";
+
 #define EQUEUE_ERROR_SIZE 2
 #define EQUEUE_EUNKNOW_STR "Unknow Error"
-
-
 const char *EQUEUE_ERROR_STRS[EQUEUE_ERROR_SIZE] = {
     "No Error",
     "Emit Error To Caller"

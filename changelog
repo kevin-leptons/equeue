@@ -1,17 +1,20 @@
 v0.3.0
-	Add equeue_cspush().
+======
+
+	- Add equeue_cspush().
+	- Fix non-extern variables.
 
 v0.2.0
-	Require end-user define Error Pushhing Function.
+======
 
-	Add equeue_push(), equeue_spush(), equeue_emit(), equeue_dump(),
-	equeue_dumpto().
-
-	Add err_space property into struct equeue_item.
-
-	Remove EQUEUE_DECLARE(), EQUEUE_DEFINE().
-
-	Remove file, line properties in struct equeue_eitem.
+	- Require end-user define Error Pushhing Function.
+	- Add equeue_push(), equeue_spush(), equeue_emit(), equeue_dump(),
+	  equeue_dumpto().
+	- Add err_space property into struct equeue_item.
+	- Remove EQUEUE_DECLARE(), EQUEUE_DEFINE().
+	- Remove file, line properties in struct equeue_eitem.
 
 v0.1.0
-	Initial version
+======
+
+	- Initial project

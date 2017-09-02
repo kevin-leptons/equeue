@@ -92,8 +92,7 @@ int main(int argc, char *argv[])
 {
     if (do_smt()) {
         equeue_dump();
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
-
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
